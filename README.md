@@ -9,7 +9,7 @@ AI 그림을 위한 프롬프트 랜덤 생성기입니다. 클릭 한 번으로
 - **가중치 시스템**: 자주 쓰고 싶은 태그는 더 높은 확률로 등장
 - **커스텀 리스트**: 나만의 단어 리스트 추가/제거 가능
 - **가로&세로 랜덤 포즈**: 가로포즈와 세로 포즈르 나누어 세로&가로 사이즈를 정해서 가로세로 맞는 포즈를 랜덤으로!
- <img width="349" height="782" alt="{BE597C66-F62E-417A-9B53-7E4273CBF1AF}" src="https://github.com/user-attachments/assets/af55b703-62e6-4401-8d74-778cca2b6452" />
+<img width="335" height="721" alt="{C1C71529-99FF-487B-8B54-FAEFEEE1E947}" src="https://github.com/user-attachments/assets/6e17094e-c0d2-4566-bbcf-f9029048f40e" />
 
 #### 🚀 사용법
 1. 저장소 클론
