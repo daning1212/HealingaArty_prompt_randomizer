@@ -1,5 +1,53 @@
 import random
-import time
+
+# Automatic pose selection contains only body posture and framing.
+# Legacy menu entries remain available for saved workflows/manual selection.
+PURE_POSES = {
+    "세로포즈": [f"{pose}, vertical" for pose in (
+        "standing upright, arms relaxed at sides", "standing hands on hips",
+        "standing arms folded", "standing hands behind back",
+        "standing one hand on hip", "standing arms raised overhead",
+        "standing arms extended sideways", "standing elbows bent, palms upward",
+        "standing weight on left leg", "standing weight on right leg",
+        "standing ankles crossed", "standing feet wide apart",
+        "standing side profile", "standing three-quarter turn",
+        "standing back view, head turned over shoulder", "standing one knee raised",
+        "standing on tiptoes", "standing one arm extended forward",
+        "standing hands clasped in front", "standing one hand on chin",
+        "standing hands on cheeks", "standing one arm behind head",
+        "standing both hands behind head", "standing torso tilted sideways",
+        "standing torso leaning slightly forward", "standing shoulders turned",
+        "kneeling upright, hands on thighs", "kneeling on one knee",
+        "kneeling hands clasped", "squatting hands on knees",
+        "squatting arms resting on knees", "sitting upright, knees together",
+        "sitting one knee raised", "sitting legs crossed",
+        "standing one heel raised", "standing elbows drawn back",
+        "standing palms together at chest", "standing one hand on opposite shoulder",
+        "standing forearms crossed behind back", "standing one arm raised diagonally",
+    )],
+    "가로포즈": [f"{pose}, horizontal" for pose in (
+        "lying on back, arms at sides", "lying on stomach, chin on hands",
+        "lying on left side, knees bent", "lying on right side, legs extended",
+        "lying on back, hands behind head", "lying on stomach, feet crossed",
+        "lying on side, propped on elbow", "lying on back, knees bent",
+        "lying on back, ankles crossed", "lying on side, one knee raised",
+        "lying on stomach, forearms supporting torso", "lying curled up",
+        "lying on back, one arm overhead", "lying on back, arms extended sideways",
+        "lying on stomach, arms extended forward", "lying on side, hand on hip",
+        "lying on back, one knee drawn to chest", "lying on side, legs crossed at knees",
+        "sitting legs extended forward", "sitting one leg bent, one leg extended",
+        "sitting leaning back on hands", "sitting hugging knees",
+        "sitting butterfly stretch", "sitting legs extended diagonally",
+        "sitting torso twisted sideways", "sitting leaning forward, arms extended",
+        "sitting knees bent to one side", "sitting ankles crossed, hands on knees",
+        "lying on back, legs raised vertically", "lying on side, upper leg raised",
+        "lying on stomach, knees bent and feet raised", "lying on back, hands on abdomen",
+        "lying on side, lower arm extended", "lying on back, arms and legs extended",
+        "lying on stomach, head turned sideways", "lying on back, knees together tilted sideways",
+        "lying on side, knees drawn toward chest", "sitting cross-legged, palms on knees",
+        "sitting one knee raised, forearm resting on knee", "lying on back, elbows bent beside head",
+    )],
+}
 
 class HealingArtyPromptRandomizerV11:
     @classmethod
@@ -7,7 +55,7 @@ class HealingArtyPromptRandomizerV11:
         return {
             "required": {
                 "시드": ("INT", {"default": -1, "min": -1, "max": 0xffffffffffffffff}),
-                "랜덤_모드": (["고정", "완전랜덤"], {"default": "완전랜덤"}),
+                "랜덤_모드": (["고정", "완전랜덤", "순차"], {"default": "완전랜덤"}),
             },
             "optional": {
                 "헤어스타일": ([
@@ -51,7 +99,20 @@ class HealingArtyPromptRandomizerV11:
                 ],),
                 "헤어스타일_가중치": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 2.0, "step": 0.1}),
 
-                "표정": (["none", "random", "smiling", "expressionless", "winking", "slight smile", "confident look", "surprised", "seductive"],),
+                "표정": (["none", "random", "smiling", "expressionless", "winking", "slight smile", "confident look", "surprised", "seductive",
+                    "gentle closed-mouth smile", "broad toothy smile", "joyful laughter",
+                    "amused smile", "shy smile", "awkward smile", "relieved smile",
+                    "proud expression", "hopeful expression", "serene expression",
+                    "thoughtful expression", "curious expression", "puzzled expression",
+                    "skeptical expression, one eyebrow raised", "shocked expression, wide eyes",
+                    "awe-struck expression", "worried expression", "nervous expression",
+                    "sad expression", "tearful eyes", "disappointed expression",
+                    "lonely expression", "nostalgic expression", "determined expression",
+                    "serious expression", "focused expression", "angry expression, furrowed brows",
+                    "annoyed expression", "frustrated expression", "pouting",
+                    "playful grin", "mischievous smirk", "embarrassed expression",
+                    "sleepy expression, heavy eyelids", "tired expression", "bored expression",
+                    "unimpressed expression", "tender expression", "grateful expression"],),
                 "표정_가중치": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 2.0, "step": 0.1}),
 
                 "의상": ([
@@ -343,6 +404,8 @@ class HealingArtyPromptRandomizerV11:
                     "crawling toward camera, sexy horizontal", "lying on back knees bent apart, sexy horizontal", "lying on side hand on hip, sexy horizontal",
                     "lying on stomach pushing up, sexy horizontal", "lying on back arching neck, sexy horizontal", "lying on side legs crossed at knee, sexy horizontal"
                 ],),
+                "순차_시작번호": ("INT", {"default": 1, "min": 1, "max": 1000000}),
+                "순차_리셋": ("INT", {"default": 0, "min": 0, "max": 1000000}),
             }
         }
 
@@ -352,7 +415,16 @@ class HealingArtyPromptRandomizerV11:
     CATEGORY = "HealingArty"
 
     def generate(self, 시드, 랜덤_모드, **kwargs):
-        if 랜덤_모드 == "완전랜덤" or 시드 == -1:
+        sequential = 랜덤_모드 == "순차"
+        sequence_key = (kwargs.get("순차_시작번호", 1), kwargs.get("순차_리셋", 0))
+        if sequential and (getattr(self, "_sequence_key", None) != sequence_key
+                           or getattr(self, "_last_mode", None) != "순차"):
+            self._sequence_key = sequence_key
+            self._sequence_positions = {}
+        self._last_mode = 랜덤_모드
+        if sequential:
+            실제_시드 = max(0, 시드)
+        elif 랜덤_모드 == "완전랜덤" or 시드 == -1:
             실제_시드 = random.randint(0, 0xffffffffffffffff)
         else:
             실제_시드 = 시드
@@ -361,16 +433,24 @@ class HealingArtyPromptRandomizerV11:
         parts = []
         details = []
 
+        options = self.INPUT_TYPES()["optional"]
         for key, val in kwargs.items():
-            if key.endswith("_가중치") or key == "추가_태그":
+            if key.endswith("_가중치") or key in ("추가_태그", "순차_시작번호", "순차_리셋"):
                 continue
             if val not in [None, "none"]:
                 if val == "random":
-                    옵션리스트 = self.INPUT_TYPES()["optional"][key][0][2:]
-                    picked = rng.choice(옵션리스트)
+                    옵션리스트 = PURE_POSES.get(key, options[key][0][2:])
+                    if sequential:
+                        position = self._sequence_positions.get(key, sequence_key[0] - 1)
+                        picked = 옵션리스트[position % len(옵션리스트)]
+                        self._sequence_positions[key] = position + 1
+                        details.append(f"{key} 순번: {position % len(옵션리스트) + 1}/{len(옵션리스트)}")
+                    else:
+                        picked = rng.choice(옵션리스트)
                 else:
                     picked = val
-                parts.append(picked)
+                weight = kwargs.get(f"{key}_가중치", 1.0)
+                parts.append(f"({picked}:{weight:g})" if weight != 1.0 else picked)
                 details.append(f"{key}: {picked}")
 
         추가_태그 = kwargs.get("추가_태그", "")
@@ -378,14 +458,14 @@ class HealingArtyPromptRandomizerV11:
             parts.append(추가_태그.strip())
 
         positive_prompt = ", ".join(parts) if parts else "1girl"
-        세부사항 = f"Seed: {실제_시드} | " + " / ".join(details)
+        세부사항 = f"Mode: {랜덤_모드} | Seed: {실제_시드} | " + " / ".join(details)
 
         return (positive_prompt, 세부사항, 실제_시드)
 
     @classmethod
     def IS_CHANGED(cls, 시드, 랜덤_모드, **kwargs):
-        if 랜덤_모드 == "완전랜덤" or 시드 == -1:
-            return time.time()
+        if 랜덤_모드 in ("완전랜덤", "순차") or 시드 == -1:
+            return float("nan")
         return 시드
 
 NODE_CLASS_MAPPINGS = {"HealingArtyPromptRandomizerV11": HealingArtyPromptRandomizerV11}
