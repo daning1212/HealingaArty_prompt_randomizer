@@ -1,4 +1,5 @@
 import random
+import re
 
 # Automatic pose selection contains only body posture and framing.
 # Legacy menu entries remain available for saved workflows/manual selection.
@@ -24,6 +25,98 @@ PURE_POSES = {
         "standing one heel raised", "standing elbows drawn back",
         "standing palms together at chest", "standing one hand on opposite shoulder",
         "standing forearms crossed behind back", "standing one arm raised diagonally",
+        "walking forward, arms swinging naturally",
+        "walking away, relaxed stride", "walking in side profile",
+        "walking diagonally toward camera", "walking with a long stride",
+        "walking with small measured steps", "walking on tiptoes",
+        "walking with hands behind back", "walking with one hand on hip",
+        "walking and turning head sideways", "walking and looking over shoulder",
+        "walking with crossed runway steps", "walking with shoulders relaxed",
+        "walking with torso turning", "walking mid-step, heel lifting",
+        "walking mid-step, front heel touching down",
+        "jogging forward, elbows bent", "jogging in side profile",
+        "jogging away from camera", "running forward, arms pumping",
+        "running in side profile, long stride", "running diagonally",
+        "sprinting, torso leaning forward", "running mid-stride, both feet airborne",
+        "running with one knee lifted high", "running while turning head sideways",
+        "slowing from a run, shortened stride", "standing catching breath, hands on hips",
+        "bending forward catching breath, hands on knees",
+        "stepping sideways, arms balancing", "stepping backward, one arm extended",
+        "pivoting on one foot", "turning around mid-step",
+        "skipping forward, one knee lifted", "hopping on one foot",
+        "jumping straight upward, arms raised", "jumping with knees bent",
+        "jumping with arms and legs spread", "landing from a jump, knees flexed",
+        "standing reaching upward with one hand", "standing reaching forward with both hands",
+        "standing reaching sideways", "standing waving at shoulder height",
+        "standing pointing sideways", "standing pointing upward",
+        "standing palms facing outward", "standing shrugging, palms upward",
+        "standing brushing hair back with one hand", "standing tucking hair behind ear",
+        "standing rubbing the back of neck", "standing rubbing one shoulder",
+        "standing covering a yawn with one hand", "standing stretching both arms upward",
+        "standing stretching one arm across chest", "standing stretching triceps overhead",
+        "standing side stretch, arm curved overhead", "standing torso twist, hands on waist",
+        "standing calf stretch, one leg extended back", "standing quad stretch, holding ankle",
+        "standing balancing on one leg, arms out",
+        "standing ankles together, hips gently shifted",
+        "standing torso in a gentle S-curve", "standing hips angled, shoulders facing forward",
+        "standing one hand resting at waist, opposite shoulder lowered",
+        "standing three-quarter back view, chin turned toward shoulder",
+        "standing slight back arch, arms relaxed",
+        "standing one knee bent inward, hands behind back",
+        "standing one leg extended diagonally, toe pointed",
+        "standing shoulders angled, hand resting on opposite upper arm",
+        "standing head tilted, one hand resting on collarbone",
+        "standing arms loosely crossed at waist",
+        "sitting down, knees bending and torso forward",
+        "rising from sitting, weight shifting forward",
+        "sitting upright, hands resting on thighs",
+        "sitting ankles crossed, torso turned sideways",
+        "sitting knees together, legs angled sideways",
+        "sitting leaning forward, elbows resting on knees",
+        "sitting hands clasped between knees",
+        "sitting one hand supporting chin, elbow on knee",
+        "sitting back straight, shoulders turned",
+        "sitting one leg crossed over the other, hands folded",
+        "kneeling upright, arms stretched upward",
+        "kneeling on one knee, torso turned",
+        "kneeling sitting back on heels, hands in lap",
+        "lowering onto one knee, arms balancing",
+        "rising from kneeling, one foot planted",
+        "squatting with heels raised, arms forward",
+        "squatting torso turned sideways",
+        "standing half squat, hands extended forward",
+        "dancing side step, one arm curved overhead",
+        "dancing with crossed feet, arms extended",
+        "dancing mid-turn, one heel raised",
+        "dancing with bent knees, shoulders tilted",
+        "ballet first position, arms rounded in front",
+        "ballet releve, arms rounded overhead",
+        "ballet arabesque, one leg extended backward",
+        "standing lunge, arms extended at shoulder height",
+        "standing wide stance, one knee bent and opposite leg straight",
+        "standing hands together near cheek, head tilted",
+        "standing one palm resting over chest",
+        "standing loosely hugging own shoulders",
+        "studio portrait pose, shoulders square, chin level, hands relaxed",
+        "studio portrait pose, torso turned thirty degrees, face toward camera",
+        "studio portrait pose, arms loosely folded, shoulders lowered",
+        "studio portrait pose, one hand lightly holding opposite wrist",
+        "studio portrait pose, hands loosely clasped at waist",
+        "studio portrait pose, one hand on hip, other arm relaxed",
+        "studio portrait pose, shoulders at different heights, head gently tilted",
+        "studio portrait pose, chin resting lightly on knuckles",
+        "studio portrait pose, fingers resting gently near jawline",
+        "studio portrait pose, side profile with straight posture",
+        "studio portrait pose, three-quarter back view, face turned to camera",
+        "studio portrait pose, elbows close to body, palms loosely joined",
+        "studio portrait pose, seated upright, hands resting on knees",
+        "studio portrait pose, seated sideways, torso turned toward camera",
+        "studio portrait pose, seated ankles crossed, hands folded in lap",
+        "studio portrait pose, leaning slightly forward, forearms on thighs",
+        "studio portrait pose, hands behind back, chest open",
+        "studio portrait pose, one hand on opposite forearm",
+        "studio portrait pose, torso angled, eyes level with camera",
+        "studio portrait pose, feet staggered, weight on rear leg",
     )],
     "가로포즈": [f"{pose}, horizontal" for pose in (
         "lying on back, arms at sides", "lying on stomach, chin on hands",
@@ -46,16 +139,143 @@ PURE_POSES = {
         "lying on stomach, head turned sideways", "lying on back, knees together tilted sideways",
         "lying on side, knees drawn toward chest", "sitting cross-legged, palms on knees",
         "sitting one knee raised, forearm resting on knee", "lying on back, elbows bent beside head",
+        "lying on back, one leg extended and other knee bent",
+        "lying on back, fingers interlaced over abdomen",
+        "lying on back, palms facing upward beside torso",
+        "lying on back, hands resting on ribs",
+        "lying on back, one hand behind head and other at side",
+        "lying on back, both arms stretched overhead",
+        "lying on back, one ankle resting over opposite knee",
+        "lying on back, both knees drawn toward chest",
+        "lying on back, knees tilted left and arms open",
+        "lying on back, knees tilted right and arms open",
+        "lying on back, lower legs raised parallel to ground",
+        "lying on back, one straight leg raised diagonally",
+        "lying on back, shoulders gently lifted",
+        "lying on back, head turned toward camera",
+        "lying on stomach, hands folded under cheek",
+        "lying on stomach, cheek resting on forearm",
+        "lying on stomach, chin lifted and elbows beneath shoulders",
+        "lying on stomach, one knee bent outward",
+        "lying on stomach, one forearm forward and other bent",
+        "lying on stomach, hands behind lower back",
+        "lying on stomach, one leg lifted slightly",
+        "lying on stomach, arms extended sideways",
+        "lying on stomach, torso gently twisted to one side",
+        "lying on side, head resting on lower arm",
+        "lying on side, head supported by hand",
+        "lying on side, upper hand resting in front of chest",
+        "lying on side, one leg straight and other bent",
+        "lying on side, ankles crossed and upper hand at waist",
+        "lying on side, shoulders turned slightly toward camera",
+        "lying on side, upper arm curved overhead",
+        "lying on side, knees stacked and feet together",
+        "lying on side, torso forming a gentle curve",
+        "reclining on forearms, knees bent together",
+        "reclining on one forearm, legs extended diagonally",
+        "reclining with one knee raised, opposite leg straight",
+        "reclining with ankles crossed, shoulders relaxed",
+        "reclining sideways, hand resting on waist",
+        "reclining with torso gently arched, elbows supporting weight",
+        "sitting legs straight, hands beside hips",
+        "sitting legs apart in a gentle stretch, torso upright",
+        "sitting cross-legged, hands loosely clasped",
+        "sitting cross-legged, torso turned left",
+        "sitting cross-legged, torso turned right",
+        "sitting hugging one knee, other leg extended",
+        "sitting both knees raised, forehead near knees",
+        "sitting knees together, arms wrapped around shins",
+        "sitting sideways with both legs folded",
+        "sitting one leg folded under, other knee raised",
+        "sitting leaning back on one hand, other on knee",
+        "sitting leaning sideways onto forearm",
+        "sitting reaching toward toes with both hands",
+        "sitting reaching toward one foot, other knee bent",
+        "sitting side stretch, one arm curved overhead",
+        "sitting back upright, arms extended sideways",
+        "sitting shoulders twisted, one hand behind torso",
+        "sitting knees bent, feet flat and hands behind hips",
+        "sitting with ankles crossed, chin resting on hand",
+        "kneeling leaning forward, arms extended",
+        "kneeling curled forward, arms beside legs",
+        "kneeling forearms down, hips above knees",
+        "kneeling reaching one arm forward",
+        "on hands and knees, back neutral",
+        "on hands and knees, spine rounded",
+        "on hands and knees, chest gently lifted",
+        "on hands and knees, opposite arm and leg extended",
+        "low lunge, front knee bent and hands beside front foot",
+        "forearm plank, body aligned",
+        "high plank, arms straight",
+        "side plank, upper arm extended upward",
+        "side plank, lower knee bent for support",
+        "push-up lowered position, elbows bent",
+        "push-up raised position, elbows straight",
+        "supine bridge, knees bent and hips lifted",
+        "supine bridge, one leg extended",
+        "seated balance, knees bent and feet lifted",
+        "seated balance, arms extended forward",
+        "prone back extension, arms beside torso",
+        "prone stretch, opposite arm and leg lifted",
+        "lying on back, alternating bent knees",
+        "lying on back, feet together and knees relaxed outward",
+        "lying on side, upper knee opening while feet stay together",
+        "lying on back, one arm reaching across torso",
+        "lying on stomach, one hand reaching forward",
+        "sitting shifting weight onto one hip",
+        "rolling from back onto side, knees slightly bent",
+        "rising from lying, one elbow supporting torso",
+        "lowering from sitting onto one forearm",
+        "curling sideways, hands tucked near cheek",
+        "lying on side, legs gently staggered",
+        "lying on back, elbows wide and hands lightly behind head",
+        "reclining with one arm overhead, head turned sideways",
+        "sitting legs extended to one side, shoulders turned oppositely",
+        "sitting torso angled forward, hands resting loosely on knees",
+        "lying on stomach, feet raised and ankles loosely crossed",
+        "lying on side, one hand resting on opposite shoulder",
+        "sitting legs folded, one arm reaching diagonally upward",
+        "lying on back, stretching fingertips and toes in opposite directions",
+        "lying on side, forearm across waist and legs extended",
+        "reclining with knees together angled sideways",
+        "sitting gently leaning forward, chin raised",
     )],
+}
+
+GROUP_POSES = {
+    "정면 나란히": lambda n: "standing front-facing, hands relaxed" if n == 1 else
+        f"all {n} people standing side by side in one row, facing camera, evenly spaced",
+    "몸을 살짝 틀기": lambda n: "standing with torso at a three-quarter angle, face toward camera" if n == 1 else
+        f"all {n} people standing in one row, each torso slightly angled toward the center, faces toward camera",
+    "팔짱 프로필": lambda n: "standing with arms loosely folded, shoulders relaxed" if n == 1 else
+        f"all {n} people standing side by side with their own arms loosely folded, clear space between bodies",
+    "앉아서 촬영": lambda n: "sitting upright, hands resting on thighs" if n == 1 else
+        f"all {n} people sitting side by side, hands resting on their own thighs, every face visible",
+    "높낮이 두 줄": lambda n: "sitting with one knee raised, forearm resting on knee" if n == 1 else
+        f"{n // 2} people sitting in front and {n - n // 2} people standing behind, staggered faces, exactly {n} people total",
+    "완만한 반원": lambda n: "standing with one hand on hip, body turned slightly" if n == 1 else
+        f"all {n} people standing in a shallow semicircle, facing camera, no overlapping faces",
+    "대각선 배치": lambda n: "standing diagonally, head turned toward camera" if n == 1 else
+        f"all {n} people arranged along a shallow diagonal, staggered sideways so every face is visible",
+    "함께 걷기": lambda n: "walking naturally toward camera, arms swinging" if n == 1 else
+        f"all {n} people walking toward camera side by side, natural alternating strides, evenly spaced",
+    "편하게 기대기": lambda n: "standing with weight shifted to one leg, shoulders relaxed" if n == 1 else
+        f"all {n} people standing close side by side, shoulders gently leaning toward neighbors, faces unobstructed",
+    "손 흔들기": lambda n: "standing and waving one hand beside shoulder" if n == 1 else
+        f"all {n} people standing in one row, each waving one hand beside their own shoulder, hands away from faces",
+    "뒤돌아보기": lambda n: "standing with back turned, looking toward camera over shoulder" if n == 1 else
+        f"all {n} people standing in a staggered row with backs partly turned, each looking over shoulder toward camera",
+    "앉아서 몸 틀기": lambda n: "sitting with knees angled sideways, shoulders facing camera" if n == 1 else
+        f"all {n} people sitting side by side with knees angled slightly and shoulders facing camera, separate visible faces",
 }
 
 class HealingArtyPromptRandomizerV11:
     @classmethod
     def INPUT_TYPES(cls):
-        return {
+        inputs = {
             "required": {
                 "시드": ("INT", {"default": -1, "min": -1, "max": 0xffffffffffffffff}),
-                "랜덤_모드": (["고정", "완전랜덤", "순차"], {"default": "완전랜덤"}),
+                "시드_모드": (["고정", "자동"], {"default": "자동"}),
             },
             "optional": {
                 "헤어스타일": ([
@@ -404,27 +624,26 @@ class HealingArtyPromptRandomizerV11:
                     "crawling toward camera, sexy horizontal", "lying on back knees bent apart, sexy horizontal", "lying on side hand on hip, sexy horizontal",
                     "lying on stomach pushing up, sexy horizontal", "lying on back arching neck, sexy horizontal", "lying on side legs crossed at knee, sexy horizontal"
                 ],),
-                "순차_시작번호": ("INT", {"default": 1, "min": 1, "max": 1000000}),
-                "순차_리셋": ("INT", {"default": 0, "min": 0, "max": 1000000}),
+                "촬영_인원": (["none", "1", "2", "3", "4", "5", "6"],),
+                "프로필_단체포즈": (["none", "random", *GROUP_POSES],),
             }
         }
+        for name, spec in inputs["optional"].items():
+            if isinstance(spec[0], list) and "random" in spec[0]:
+                spec[0].insert(2, "순차")
+                if name in PURE_POSES:
+                    spec[0].extend(pose for pose in PURE_POSES[name] if pose not in spec[0])
+        return inputs
 
     RETURN_TYPES = ("STRING", "STRING", "INT")
     RETURN_NAMES = ("positive_prompt", "세부사항", "사용된_시드")
     FUNCTION = "generate"
     CATEGORY = "HealingArty"
 
-    def generate(self, 시드, 랜덤_모드, **kwargs):
-        sequential = 랜덤_모드 == "순차"
-        sequence_key = (kwargs.get("순차_시작번호", 1), kwargs.get("순차_리셋", 0))
-        if sequential and (getattr(self, "_sequence_key", None) != sequence_key
-                           or getattr(self, "_last_mode", None) != "순차"):
-            self._sequence_key = sequence_key
+    def generate(self, 시드, 시드_모드="자동", **kwargs):
+        if not hasattr(self, "_sequence_positions"):
             self._sequence_positions = {}
-        self._last_mode = 랜덤_모드
-        if sequential:
-            실제_시드 = max(0, 시드)
-        elif 랜덤_모드 == "완전랜덤" or 시드 == -1:
+        if 시드_모드 == "자동" or 시드 == -1:
             실제_시드 = random.randint(0, 0xffffffffffffffff)
         else:
             실제_시드 = 시드
@@ -434,14 +653,29 @@ class HealingArtyPromptRandomizerV11:
         details = []
 
         options = self.INPUT_TYPES()["optional"]
+        count_value = kwargs.get("촬영_인원", "none")
+        count = int(count_value) if str(count_value) in ("1", "2", "3", "4", "5", "6") else None
+        group_active = count is not None and kwargs.get("프로필_단체포즈", "none") != "none"
+        if count is not None:
+            parts.append("solo portrait of one adult" if count == 1 else
+                         f"group portrait of exactly {count} adults, {count} people total, all faces visible")
+            details.append(f"촬영 인원: {count}")
         for key, val in kwargs.items():
-            if key.endswith("_가중치") or key in ("추가_태그", "순차_시작번호", "순차_리셋"):
+            if key.endswith("_가중치") or key in ("추가_태그", "순차_시작번호", "순차_리셋", "촬영_인원"):
+                continue
+            if group_active and key in ("가로포즈", "세로포즈"):
+                continue
+            if key == "프로필_단체포즈" and count is None:
+                continue
+            if key not in options:
                 continue
             if val not in [None, "none"]:
-                if val == "random":
-                    옵션리스트 = PURE_POSES.get(key, options[key][0][2:])
-                    if sequential:
-                        position = self._sequence_positions.get(key, sequence_key[0] - 1)
+                if val in ("random", "순차"):
+                    옵션리스트 = PURE_POSES.get(key, [
+                        item for item in options[key][0] if item not in ("none", "random", "순차")
+                    ])
+                    if val == "순차":
+                        position = self._sequence_positions.get(key, 0)
                         picked = 옵션리스트[position % len(옵션리스트)]
                         self._sequence_positions[key] = position + 1
                         details.append(f"{key} 순번: {position % len(옵션리스트) + 1}/{len(옵션리스트)}")
@@ -449,22 +683,32 @@ class HealingArtyPromptRandomizerV11:
                         picked = rng.choice(옵션리스트)
                 else:
                     picked = val
+                if key == "프로필_단체포즈":
+                    picked = GROUP_POSES[picked](count)
                 weight = kwargs.get(f"{key}_가중치", 1.0)
                 parts.append(f"({picked}:{weight:g})" if weight != 1.0 else picked)
                 details.append(f"{key}: {picked}")
 
         추가_태그 = kwargs.get("추가_태그", "")
+        if count is not None:
+            추가_태그 = re.sub(r"\b1(?:girl|boy|woman|man)\b", "", 추가_태그, flags=re.IGNORECASE)
+            if count > 1:
+                추가_태그 = re.sub(r"\bsolo\b", "", 추가_태그, flags=re.IGNORECASE)
+            추가_태그 = ", ".join(part.strip() for part in 추가_태그.split(",") if part.strip())
         if 추가_태그.strip():
             parts.append(추가_태그.strip())
 
         positive_prompt = ", ".join(parts) if parts else "1girl"
-        세부사항 = f"Mode: {랜덤_모드} | Seed: {실제_시드} | " + " / ".join(details)
+        세부사항 = f"Seed mode: {시드_모드} | Seed: {실제_시드} | " + " / ".join(details)
 
         return (positive_prompt, 세부사항, 실제_시드)
 
     @classmethod
-    def IS_CHANGED(cls, 시드, 랜덤_모드, **kwargs):
-        if 랜덤_모드 in ("완전랜덤", "순차") or 시드 == -1:
+    def IS_CHANGED(cls, 시드, 시드_모드="자동", **kwargs):
+        categories = cls.INPUT_TYPES()["optional"]
+        has_sequence = any(value == "순차" for key, value in kwargs.items()
+                           if key in categories and isinstance(categories[key][0], list))
+        if 시드_모드 == "자동" or 시드 == -1 or has_sequence:
             return float("nan")
         return 시드
 

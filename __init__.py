@@ -8,4 +8,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "HealingArtyPromptRandomizerV11": "HealingArty Prompt Randomizer V11"
 }
 
-__all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']
+WEB_DIRECTORY = "./js"
+__all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY']
