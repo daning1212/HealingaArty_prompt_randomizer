@@ -269,6 +269,204 @@ GROUP_POSES = {
         f"all {n} people sitting side by side with knees angled slightly and shoulders facing camera, separate visible faces",
 }
 
+# Posture and canvas direction are independent so edit models can freely mix
+# body posture with portrait or landscape framing.
+POSTURE_POSES = {
+    "서서포즈": [
+        "standing upright, arms relaxed at sides", "standing front-facing, feet together",
+        "standing in three-quarter view", "standing in side profile",
+        "standing back view, looking over shoulder", "standing with one hand on hip",
+        "standing with both hands on hips", "standing with arms loosely folded",
+        "standing with hands clasped in front", "standing with hands behind back",
+        "standing with one hand in pocket", "standing with both hands in pockets",
+        "standing with one knee softly bent", "standing with ankles crossed",
+        "standing with feet wide apart", "standing with weight shifted to one leg",
+        "standing contrapposto", "standing on tiptoes", "standing with one heel raised",
+        "standing with one leg extended diagonally, toe pointed",
+        "standing with shoulders angled toward camera", "standing in a gentle S-curve",
+        "standing and leaning slightly forward", "standing and leaning slightly backward",
+        "standing with torso tilted sideways", "standing with torso gently twisted",
+        "standing with one arm raised overhead", "standing with both arms raised overhead",
+        "standing with arms extended sideways", "standing with palms facing forward",
+        "standing with palms together at chest", "standing with one hand on collarbone",
+        "standing with one hand touching chin", "standing with fingers near jawline",
+        "standing with one hand brushing hair back", "standing tucking hair behind ear",
+        "standing with one hand behind head", "standing with both hands behind head",
+        "standing hugging own shoulders", "standing waving beside shoulder",
+        "standing pointing to the side", "standing pointing upward",
+        "standing presenting with one open hand", "standing shrugging with palms upward",
+        "standing making a peace sign", "standing making a finger heart",
+        "standing making a hand heart above head", "standing giving a thumbs up",
+        "standing stretching both arms upward", "standing side stretch with arm overhead",
+        "standing shoulder stretch", "standing torso twist with hands on waist",
+        "standing quad stretch while holding ankle", "standing calf stretch",
+        "standing balancing on one leg with arms out", "standing yoga tree pose",
+        "standing yoga mountain pose", "standing yoga warrior pose",
+        "standing ballet first position", "standing ballet releve",
+        "standing ballet arabesque", "standing dance pose with one arm curved overhead",
+        "standing mid-turn with one heel raised", "standing dress-twirl pose",
+        "walking naturally toward camera", "walking away and looking over shoulder",
+        "walking in side profile", "walking diagonally toward camera",
+        "walking with a long confident stride", "walking with crossed runway steps",
+        "walking mid-step with heel lifted", "jogging toward camera",
+        "jogging in side profile", "running forward with arms pumping",
+        "running diagonally", "sprinting with torso leaning forward",
+        "jumping straight upward with arms raised", "jumping with knees bent",
+        "landing from a jump with knees flexed", "stepping sideways with arms balancing",
+        "turning around mid-step", "fashion model stance, torso angled",
+        "studio portrait stance, shoulders square and chin level",
+        "studio portrait stance, hands lightly holding opposite wrist",
+        "studio portrait stance, feet staggered and weight on rear leg",
+    ],
+    "앉기포즈": [
+        "sitting upright, hands resting on thighs", "sitting front-facing, knees together",
+        "sitting sideways, torso turned toward camera", "sitting with legs crossed",
+        "sitting with ankles crossed", "sitting with knees angled to one side",
+        "sitting with one knee raised", "sitting with both knees raised",
+        "sitting hugging both knees", "sitting hugging one knee",
+        "sitting with hands clasped between knees", "sitting with hands folded in lap",
+        "sitting with one hand supporting chin", "sitting leaning forward, elbows on knees",
+        "sitting leaning back on both hands", "sitting leaning back on one hand",
+        "sitting with shoulders turned", "sitting with torso twisted sideways",
+        "sitting and looking over shoulder", "sitting with one arm over chair back",
+        "sitting astride a chair, arms resting on chair back", "sitting on edge of chair",
+        "sitting on a stool with feet staggered", "sitting on a high stool, legs dangling",
+        "sitting on a bench, hands beside hips", "sitting on stairs, knees together",
+        "sitting on stairs with one knee raised", "sitting on floor, legs extended forward",
+        "sitting on floor, one leg bent and one extended", "sitting cross-legged",
+        "sitting in lotus pose", "sitting in seiza pose", "sitting butterfly stretch",
+        "sitting with legs folded to one side", "sitting with one leg folded underneath",
+        "sitting with legs extended diagonally", "sitting with legs apart in a gentle stretch",
+        "sitting reaching toward toes", "sitting side stretch with one arm overhead",
+        "sitting balance pose, knees bent and feet lifted", "sitting curled forward",
+        "sitting relaxed against a wall", "sitting against the side of a sofa",
+        "sitting on a windowsill", "sitting on a table edge",
+        "sitting on a counter edge", "sitting on a park bench",
+        "sitting and waving", "sitting and making a peace sign",
+        "sitting and brushing hair behind ear", "sitting with fingers near cheek",
+        "sitting with arms loosely folded", "sitting with palms on knees",
+        "sitting meditation pose", "sitting profile pose with straight back",
+        "sitting three-quarter portrait pose", "sitting fashion pose, chin raised",
+        "kneeling upright, hands on thighs", "kneeling upright, hands in lap",
+        "kneeling on one knee", "kneeling while sitting back on heels",
+        "kneeling with hands clasped", "kneeling with one arm raised",
+        "half-kneeling with front foot planted", "squatting with hands on knees",
+        "squatting with arms resting on knees", "squatting with heels raised",
+        "low squat, elbows inside knees", "crouching sideways and looking at camera",
+    ],
+    "누워포즈": [
+        "lying on back, arms relaxed at sides", "lying on back, hands on abdomen",
+        "lying on back, hands behind head", "lying on back, one arm overhead",
+        "lying on back, both arms overhead", "lying on back, arms extended sideways",
+        "lying on back, knees bent", "lying on back, ankles crossed",
+        "lying on back, one knee raised", "lying on back, one knee drawn to chest",
+        "lying on back, both knees drawn to chest", "lying on back, legs extended diagonally",
+        "lying on back, head turned toward camera", "lying on back, shoulders gently lifted",
+        "lying on back, one ankle resting over opposite knee",
+        "lying on back, knees tilted sideways with arms open",
+        "lying on stomach, head turned sideways", "lying on stomach, chin on hands",
+        "lying on stomach, cheek resting on forearm", "lying on stomach, hands under cheek",
+        "lying on stomach, forearms supporting torso", "lying on stomach, arms forward",
+        "lying on stomach, arms extended sideways", "lying on stomach, feet crossed",
+        "lying on stomach, knees bent and feet raised", "lying on stomach, one knee bent outward",
+        "lying on stomach, looking back over shoulder", "lying on stomach, one leg slightly raised",
+        "lying on left side, legs extended", "lying on right side, legs extended",
+        "lying on side, knees softly bent", "lying on side, knees drawn toward chest",
+        "lying on side, head resting on lower arm", "lying on side, head supported by hand",
+        "lying on side, propped on elbow", "lying on side, one knee raised",
+        "lying on side, one leg straight and one bent", "lying on side, ankles crossed",
+        "lying on side, upper arm curved overhead", "lying on side, upper hand at waist",
+        "lying on side, shoulders turned toward camera", "lying on side in a gentle S-curve",
+        "reclining on both forearms, knees bent", "reclining on one forearm, legs extended",
+        "reclining with one knee raised", "reclining with ankles crossed",
+        "reclining sideways, hand resting on waist", "reclining with one arm overhead",
+        "curled up on side, hands near cheek", "resting in a relaxed fetal position",
+        "rolling from back onto side", "rising from lying, supported by one elbow",
+        "supine bridge pose, knees bent", "side plank with upper arm raised",
+        "forearm plank with body aligned", "prone back extension",
+    ],
+}
+
+CANVAS_DIRECTIONS = [
+    "portrait orientation, vertical composition",
+    "landscape orientation, horizontal composition",
+    "square composition",
+]
+
+EXTRA_OPTIONS = {
+    "의상": [
+        "plain white t-shirt and blue jeans", "oversized t-shirt and straight jeans",
+        "button-up shirt and tailored trousers", "linen shirt and wide-leg pants",
+        "cotton blouse and midi skirt", "cardigan and pleated midi skirt",
+        "crewneck sweater and relaxed jeans", "turtleneck sweater and wool trousers",
+        "hoodie and jogger pants", "zip-up hoodie and cargo pants",
+        "denim jacket, t-shirt and jeans", "leather jacket, t-shirt and black jeans",
+        "trench coat and tailored pants", "wool coat and knit dress",
+        "bomber jacket and cargo trousers", "blazer, crewneck shirt and slacks",
+        "business suit with button-up shirt", "pencil skirt suit with silk blouse",
+        "casual shirt dress with belt", "floral midi dress", "knit midi dress",
+        "wrap midi dress", "denim overalls and t-shirt", "workwear coveralls",
+        "pajama set, cotton", "silk pajama set", "tracksuit, sporty",
+        "tennis outfit, polo shirt and pleated skirt",
+        "golf outfit, polo shirt and tailored shorts",
+        "yoga top and full-length leggings", "running top and athletic shorts",
+        "cycling jersey and cycling shorts", "winter puffer jacket and knit pants",
+        "raincoat and waterproof trousers", "hanbok, modern elegant style",
+        "kimono, traditional elegant style", "cheongsam, classic elegant style",
+        "bohemian blouse and maxi skirt", "utility vest and cargo pants",
+        "sleeveless blouse and culottes",
+    ],
+    "란제리": [
+        "lingerie, seamless everyday bra and brief set",
+        "lingerie, cotton bralette and brief set",
+        "lingerie, wireless bra and high-rise brief",
+        "lingerie, sports bra and boyshort set",
+        "lingerie, triangle bralette and bikini brief",
+        "lingerie, longline bralette and hipster brief",
+        "lingerie, balconette bra and matching brief",
+        "lingerie, demi bra and cheeky brief",
+        "lingerie, plunge bra and bikini brief",
+        "lingerie, strapless bra and high-waist brief",
+        "lingerie, satin camisole and tap shorts",
+        "lingerie, lace camisole and matching shorts",
+        "lingerie, silk chemise", "lingerie, satin slip",
+        "lingerie, lace-trim bodysuit", "lingerie, vintage longline set",
+        "lingerie, bridal white lace set", "lingerie, embroidered floral set",
+        "lingerie, velvet trim set", "lingerie, ribbed lounge bralette set",
+        "lingerie, sheer robe over matching set",
+        "lingerie, satin robe over camisole set",
+        "lingerie, garter belt with opaque stockings",
+        "lingerie, garter belt with sheer stockings",
+        "lingerie, classic corset and brief set",
+    ],
+    "신발": [
+        "canvas sneakers", "running shoes", "high-top sneakers", "platform sneakers",
+        "slip-on sneakers", "ballet flats", "Mary Jane shoes", "Oxford shoes",
+        "Derby shoes", "monk strap shoes", "moccasins", "boat shoes",
+        "ankle boots", "Chelsea boots", "combat boots", "hiking boots",
+        "knee-high boots", "over-the-knee boots", "cowboy boots", "rain boots",
+        "snow boots", "stiletto heels", "kitten heels", "block heels",
+        "platform heels", "wedge heels", "slingback heels", "pointed-toe pumps",
+        "peep-toe heels", "strappy heels", "flat sandals", "strappy sandals",
+        "gladiator sandals", "platform sandals", "wedge sandals", "sport sandals",
+        "flip-flops", "house slippers", "fuzzy slippers", "traditional wooden clogs",
+    ],
+    "팬티스타킹": [
+        "sheer nude pantyhose", "sheer black pantyhose", "ultra-sheer pantyhose",
+        "semi-opaque pantyhose", "opaque black tights", "matte pantyhose",
+        "glossy pantyhose", "silky pantyhose", "shimmer pantyhose",
+        "support pantyhose", "control-top pantyhose", "high-waist pantyhose",
+        "footless tights", "stirrup tights", "seamed pantyhose",
+        "back-seam pantyhose", "fishnet tights", "micro-fishnet tights",
+        "diamond fishnet tights", "polka-dot tights", "striped tights",
+        "ribbed tights", "cable-knit tights", "lace-pattern tights",
+        "floral-pattern tights", "geometric-pattern tights", "houndstooth tights",
+        "plaid tights", "colored tights, red", "colored tights, white",
+        "colored tights, navy", "colored tights, burgundy", "colored tights, gray",
+        "thermal fleece-lined tights", "maternity pantyhose", "open-toe pantyhose",
+    ],
+}
+
 class HealingArtyPromptRandomizerV11:
     @classmethod
     def INPUT_TYPES(cls):
@@ -512,7 +710,7 @@ class HealingArtyPromptRandomizerV11:
 
                 "추가_태그": ("STRING", {"default": "high quality, detailed, photorealistic, 1girl, adult", "multiline": True}),
 
-                "세로포즈": ([
+                "서서포즈": ([
                     "none", "random", "standing facing forward, vertical", "one hand on hip standing, vertical",
                     "arms crossed standing, vertical", "leaning against wall, vertical", "standing back turned looking back, vertical",
                     "standing one leg raised, vertical", "jumping pose, vertical", "walking pose, vertical", "running pose, vertical",
@@ -573,7 +771,7 @@ class HealingArtyPromptRandomizerV11:
                     "kneeling upright hands on thighs, sexy vertical", "squatting back against wall, sexy vertical", "standing side boob pose, sexy vertical"
                 ],),
 
-                "가로포즈": ([
+                "앉기포즈": ([
                     "none", "random", "lying on bed front, horizontal", "lying face down on bed, horizontal",
                     "lying on stomach legs raised, horizontal", "lying spread eagle on bed, horizontal",
                     "lying on sofa watching TV, horizontal", "lying on ground looking sky, horizontal", "lying on grass, horizontal",
@@ -626,13 +824,25 @@ class HealingArtyPromptRandomizerV11:
                 ],),
                 "촬영_인원": (["none", "1", "2", "3", "4", "5", "6"],),
                 "프로필_단체포즈": (["none", "random", *GROUP_POSES],),
+                "누워포즈": (["none", "random"],),
+                "이미지방향": (["none", "random", *CANVAS_DIRECTIONS],),
+                "의상제거": ("BOOLEAN", {"default": False, "label_on": "원래 의상 제거", "label_off": "유지"}),
+                "팬티스타킹": (["none", "random", *EXTRA_OPTIONS["팬티스타킹"]],),
+                "팬티스타킹_가중치": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 2.0, "step": 0.1}),
             }
         }
+        for pose_name, pool in POSTURE_POSES.items():
+            inputs["optional"][pose_name] = (["none", "random", *pool],)
+        for category, additions in EXTRA_OPTIONS.items():
+            if category == "팬티스타킹":
+                continue
+            menu = inputs["optional"][category][0]
+            menu.extend(item for item in additions if item not in menu)
         for name, spec in inputs["optional"].items():
             if isinstance(spec[0], list) and "random" in spec[0]:
                 spec[0].insert(2, "순차")
-                if name in PURE_POSES:
-                    spec[0].extend(pose for pose in PURE_POSES[name] if pose not in spec[0])
+                if name in POSTURE_POSES:
+                    spec[0].extend(pose for pose in POSTURE_POSES[name] if pose not in spec[0])
         return inputs
 
     RETURN_TYPES = ("STRING", "STRING", "INT")
@@ -653,6 +863,9 @@ class HealingArtyPromptRandomizerV11:
         details = []
 
         options = self.INPUT_TYPES()["optional"]
+        if kwargs.get("의상제거", False):
+            parts.append("remove original clothing completely, replace the outfit, no remnants of the previous clothes")
+            details.append("의상제거: 켬")
         count_value = kwargs.get("촬영_인원", "none")
         count = int(count_value) if str(count_value) in ("1", "2", "3", "4", "5", "6") else None
         group_active = count is not None and kwargs.get("프로필_단체포즈", "none") != "none"
@@ -661,9 +874,9 @@ class HealingArtyPromptRandomizerV11:
                          f"group portrait of exactly {count} adults, {count} people total, all faces visible")
             details.append(f"촬영 인원: {count}")
         for key, val in kwargs.items():
-            if key.endswith("_가중치") or key in ("추가_태그", "순차_시작번호", "순차_리셋", "촬영_인원"):
+            if key.endswith("_가중치") or key in ("추가_태그", "순차_시작번호", "순차_리셋", "촬영_인원", "의상제거"):
                 continue
-            if group_active and key in ("가로포즈", "세로포즈"):
+            if group_active and key in ("서서포즈", "앉기포즈", "누워포즈"):
                 continue
             if key == "프로필_단체포즈" and count is None:
                 continue
@@ -671,7 +884,7 @@ class HealingArtyPromptRandomizerV11:
                 continue
             if val not in [None, "none"]:
                 if val in ("random", "순차"):
-                    옵션리스트 = PURE_POSES.get(key, [
+                    옵션리스트 = POSTURE_POSES.get(key, [
                         item for item in options[key][0] if item not in ("none", "random", "순차")
                     ])
                     if val == "순차":

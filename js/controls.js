@@ -7,15 +7,16 @@ app.registerExtension({
         const categoryNames = new Set(Object.entries(nodeData.input.optional ?? {})
             .filter(([, spec]) => Array.isArray(spec[0]) && spec[0].includes("none"))
             .map(([name]) => name));
+        const offToggleNames = new Set(["의상제거"]);
         const created = nodeType.prototype.onNodeCreated;
         nodeType.prototype.onNodeCreated = function () {
             const result = created?.apply(this, arguments);
             const button = this.addWidget("button", "전체 해제 · 모두 none", null, () => {
                 for (const widget of this.widgets ?? []) {
-                    if (!categoryNames.has(widget.name)) continue;
+                    if (!categoryNames.has(widget.name) && !offToggleNames.has(widget.name)) continue;
                     // Linked inputs are controlled upstream, not by their hidden widget.
                     if (this.inputs?.some(input => input.name === widget.name && input.link != null)) continue;
-                    widget.value = "none";
+                    widget.value = offToggleNames.has(widget.name) ? false : "none";
                     widget.callback?.(widget.value, app.canvas, this, undefined, undefined);
                 }
                 this.setDirtyCanvas(true, true);

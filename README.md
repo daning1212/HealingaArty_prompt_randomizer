@@ -33,7 +33,7 @@ ComfyUI를 재시작하고 브라우저에서 **Ctrl+F5**로 새로고침하세�
 | 순차 | 해당 항목을 차례대로 선택하고 끝에서 처음으로 순환 |
 | 직접 선택 | 해당 문구를 고정 출력 |
 
-예: **표정 random + 세로포즈 순차 + 의상 직접 선택 + 가로포즈 none**.
+예: **표정 random + 서서포즈 순차 + 이미지방향 세로 + 의상 직접 선택**.
 항목마다 독립적으로 설정합니다. 촬영 인원은 none 또는 1~6명을 직접 선택합니다.
 
 ## 시드
@@ -59,13 +59,22 @@ none이나 직접 선택으로 잠시 바꾸면 순차 진행은 멈추며, 다�
 
 ## 포즈
 
-- **세로 161종:** 걷기, 달리기, 뛰기, 손짓, 앉고 일어나기, 스트레칭, 춤, 자연스러운 패션 자세, 사진관 프로필 자세.
-- **가로 140종:** 눕기, 옆으로 기대기, 앉기, 몸 돌리기, 스트레칭, 운동, 편안한 프로필 자세.
-- 자동 선택용 목록은 코드의 `PURE_POSES`에서 관리합니다.
-- 자동 포즈 문구는 꽃·커피·휴대폰이나 특정 의상을 추가하지 않습니다. 사진관 프로필 항목은 스튜디오 촬영 맥락을 포함합니다.
-- 기존 포즈 메뉴는 호환성을 위해 유지합니다. 예전 소품 포함 포즈를 직접 선택하면 해당 소품도 출력됩니다.
-- 새 포즈도 메뉴에서 직접 선택할 수 있습니다. random·순차는 정리된 새 목록을 사용합니다.
+- **서서포즈 85종:** 기본 스탠딩, 패션 포즈, 손동작, 스트레칭, 걷기, 달리기, 점프, 춤과 스튜디오 포즈.
+- **앉기포즈 69종:** 의자·스툴·계단·바닥에 앉기, 무릎 꿇기, 쪼그리기, 스트레칭과 프로필 포즈.
+- **누워포즈 56종:** 바로 눕기, 엎드리기, 옆으로 눕기, 기대기, 휴식과 바닥 운동 포즈.
+- `이미지방향`은 자세와 별개입니다. 세로, 가로, 정사각 구도를 직접 선택하거나 random·순차로 사용할 수 있습니다.
+- 예: **누워포즈 + 세로 구도**, **서서포즈 + 가로 구도**처럼 자유롭게 조합할 수 있습니다.
+- 자동 선택용 자세 목록은 코드의 `POSTURE_POSES`에서 관리합니다.
+- 포즈 문구는 꽃·커피·휴대폰이나 특정 의상을 자동으로 추가하지 않습니다.
 - 모델이 자체적으로 만드는 소품이나 해부학적 오류까지 막는 기능은 아닙니다.
+
+## Edit 모델 의상 교체
+
+- `의상제거`를 켜면 원본 의상을 완전히 제거하고 새 의상으로 교체하라는 영문 지시문을 출력합니다.
+- 같은 실행에서 `의상`, `란제리`, `수영복`, `팬티스타킹`, `신발` 중 원하는 항목을 선택하면 교체 대상 의상이 함께 출력됩니다.
+- 의상제거만 켜고 새 의상을 선택하지 않으면 모델마다 결과가 불명확할 수 있으므로, 교체할 항목도 같이 지정하는 것을 권장합니다.
+- 일반 의상 40종, 란제리 25종, 신발 40종이 추가되었습니다.
+- 팬티스타킹은 36종의 새 독립 카테고리이며 자체 가중치와 random·순차 선택을 지원합니다.
 
 ## 프로필·단체 촬영: 1~6명
 
@@ -75,7 +84,7 @@ none이나 직접 선택으로 잠시 바꾸면 순차 진행은 멈추며, 다�
 
 정면 나란히, 몸을 살짝 틀기, 팔짱 프로필, 앉아서 촬영, 높낮이 두 줄, 반원, 대각선, 함께 걷기, 편하게 기대기, 손 흔들기, 뒤돌아보기, 앉아서 몸 틀기의 **12가지 배치**가 인원수에 맞춰 출력됩니다.
 
-단체 포즈가 활성화되면 기존 가로·세로 포즈는 출력에서 제외하여 충돌을 줄입니다. 메뉴 선택값은 그대로 보존됩니다.
+단체 포즈가 활성화되면 서기·앉기·눕기 개인 포즈는 출력에서 제외하여 충돌을 줄입니다. 이미지방향 선택값은 유지됩니다.
 촬영 인원이 none이면 프로필·단체 포즈는 출력하지 않습니다.
 촬영 인원만 선택하면 인원 문구만 추가할 수 있습니다.
 
@@ -111,7 +120,9 @@ The top clear-all button sets category menus to none while preserving seed, weig
 Linked inputs stay controlled upstream. Clear-all does not reset sequence counters.
 
 Seed mode is fixed or automatic. A fixed seed repeats random selections; sequential categories advance independently.
-161 vertical and 140 horizontal automatic poses are included. Legacy manual choices remain available.
+Postures are split into 85 standing, 69 sitting/kneeling, and 56 lying/reclining poses.
+Canvas direction is independent: portrait, landscape, or square can be combined with any posture.
+An edit-model clothing-removal toggle is included, plus expanded everyday outfits, lingerie, footwear, and a separate 36-item pantyhose category.
 Profile/group poses support 1–6 adults with 12 count-aware layouts. Active group poses suppress individual vertical/horizontal pose output.
 The default single-person extra tags are removed from output when a count is selected; input text remains intact.
 Actual image headcount depends on the model.
