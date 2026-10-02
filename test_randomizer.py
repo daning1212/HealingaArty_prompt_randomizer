@@ -78,6 +78,17 @@ class RandomizerTests(unittest.TestCase):
         self.assertIn(POSTURE_POSES["누워포즈"][0], prompt)
         self.assertIn("portrait orientation, vertical composition", prompt)
 
+    def test_direction_toggle_and_connected_prompt(self):
+        schema = Node.INPUT_TYPES()["optional"]
+        self.assertEqual(schema["이미지방향"][0], "BOOLEAN")
+        self.assertTrue(schema["text_in"][1]["forceInput"])
+        for vertical, expected in [(True, "portrait orientation"), (False, "landscape orientation")]:
+            prompt = Node().generate(7, "고정", text_in="a winter street", 이미지방향=vertical, 표정="smiling")[0]
+            self.assertTrue(prompt.startswith("a winter street, smiling"))
+            self.assertIn(expected, prompt)
+            self.assertNotIn("True", prompt)
+            self.assertNotIn("False", prompt)
+
     def test_edit_clothing_toggle_and_expanded_clothing(self):
         schema = Node.INPUT_TYPES()["optional"]
         self.assertGreater(len(schema["의상"][0]), 200)

@@ -825,10 +825,11 @@ class HealingArtyPromptRandomizerV11:
                 "촬영_인원": (["none", "1", "2", "3", "4", "5", "6"],),
                 "프로필_단체포즈": (["none", "random", *GROUP_POSES],),
                 "누워포즈": (["none", "random"],),
-                "이미지방향": (["none", "random", *CANVAS_DIRECTIONS],),
+                "이미지방향": ("BOOLEAN", {"default": False, "label_on": "세로", "label_off": "가로"}),
                 "의상제거": ("BOOLEAN", {"default": False, "label_on": "원래 의상 제거", "label_off": "유지"}),
                 "팬티스타킹": (["none", "random", *EXTRA_OPTIONS["팬티스타킹"]],),
                 "팬티스타킹_가중치": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 2.0, "step": 0.1}),
+                "text_in": ("STRING", {"forceInput": True}),
             }
         }
         for pose_name, pool in POSTURE_POSES.items():
@@ -859,7 +860,8 @@ class HealingArtyPromptRandomizerV11:
             실제_시드 = 시드
 
         rng = random.Random(실제_시드)
-        parts = []
+        base_prompt = kwargs.get("text_in", "") or ""
+        parts = [base_prompt.strip()] if base_prompt.strip() else []
         details = []
 
         options = self.INPUT_TYPES()["optional"]
@@ -874,7 +876,7 @@ class HealingArtyPromptRandomizerV11:
                          f"group portrait of exactly {count} adults, {count} people total, all faces visible")
             details.append(f"촬영 인원: {count}")
         for key, val in kwargs.items():
-            if key.endswith("_가중치") or key in ("추가_태그", "순차_시작번호", "순차_리셋", "촬영_인원", "의상제거"):
+            if key.endswith("_가중치") or key in ("추가_태그", "순차_시작번호", "순차_리셋", "촬영_인원", "의상제거", "이미지방향", "text_in"):
                 continue
             if group_active and key in ("서서포즈", "앉기포즈", "누워포즈"):
                 continue
@@ -901,6 +903,13 @@ class HealingArtyPromptRandomizerV11:
                 weight = kwargs.get(f"{key}_가중치", 1.0)
                 parts.append(f"({picked}:{weight:g})" if weight != 1.0 else picked)
                 details.append(f"{key}: {picked}")
+
+        if "이미지방향" in kwargs:
+            direction = kwargs["이미지방향"]
+            vertical = direction is True or direction in ("세로", "portrait orientation, vertical composition")
+            picked = CANVAS_DIRECTIONS[0 if vertical else 1]
+            parts.append(picked)
+            details.append("이미지방향: " + ("세로" if vertical else "가로"))
 
         추가_태그 = kwargs.get("추가_태그", "")
         if count is not None:

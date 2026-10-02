@@ -1,5 +1,9 @@
 import { app } from "../../scripts/app.js";
 
+const VERSION = 2;
+const directionValue = value => value === true || value === "세로" ||
+    value === "portrait orientation, vertical composition";
+
 app.registerExtension({
     name: "HealingArty.CategoryControls",
     async beforeRegisterNodeDef(nodeType, nodeData) {
@@ -7,69 +11,82 @@ app.registerExtension({
         const categoryNames = new Set(Object.entries(nodeData.input.optional ?? {})
             .filter(([, spec]) => Array.isArray(spec[0]) && spec[0].includes("none"))
             .map(([name]) => name));
-        const offToggleNames = new Set(["의상제거"]);
         const created = nodeType.prototype.onNodeCreated;
         nodeType.prototype.onNodeCreated = function () {
             const result = created?.apply(this, arguments);
+            // Keep UI-only controls after all persisted widgets. Never replace or
+            // reorder the widget array: frontend serializers retain references.
             const button = this.addWidget("button", "전체 해제 · 모두 none", null, () => {
                 for (const widget of this.widgets ?? []) {
-                    if (!categoryNames.has(widget.name) && !offToggleNames.has(widget.name)) continue;
-                    // Linked inputs are controlled upstream, not by their hidden widget.
+                    if (!categoryNames.has(widget.name) && widget.name !== "의상제거") continue;
                     if (this.inputs?.some(input => input.name === widget.name && input.link != null)) continue;
-                    widget.value = offToggleNames.has(widget.name) ? false : "none";
+                    widget.value = widget.name === "의상제거" ? false : "none";
                     widget.callback?.(widget.value, app.canvas, this, undefined, undefined);
                 }
                 this.setDirtyCanvas(true, true);
                 app.graph?.change?.();
             }, { serialize: false });
-            this.widgets.splice(this.widgets.indexOf(button), 1);
-            this.widgets.unshift(button);
+            button.serialize = false;
             this._healingClearButton = button;
             return result;
         };
-        // Keep the UI-only top button out of positional workflow values.
-        for (const method of ["serialize", "configure"]) {
-            const original = nodeType.prototype[method];
-            nodeType.prototype[method] = function (...args) {
-                const button = this._healingClearButton;
-                if (button) this.widgets = this.widgets.filter(widget => widget !== button);
-                try {
-                    if (method === "serialize") {
-                        this.properties ??= {};
-                        this.properties.healingCategoryControls = 1;
-                    }
-                    if (method === "configure" && !args[0]?.properties?.healingCategoryControls) {
-                        // Old workflows ended with start/reset integers. They must
-                        // not become the new count/pose menu values.
-                        const info = args[0];
-                        if (Array.isArray(info?.widgets_values)) {
-                            const countIndex = this.widgets.findIndex(widget => widget.name === "촬영_인원");
-                            const values = info.widgets_values.slice();
-                            if (countIndex >= 0) values.splice(countIndex);
-                            args[0] = { ...info, widgets_values: values };
-                        }
-                    }
-                    const result = original?.apply(this, args);
-                    if (method === "configure") {
-                        const mode = this.widgets?.find(widget => widget.name === "시드_모드");
-                        if (mode?.value === "순차") {
-                            for (const widget of this.widgets) {
-                                if (categoryNames.has(widget.name) && widget.value === "random") {
-                                    widget.value = "순차";
-                                }
-                            }
-                            mode.value = "고정";
-                        } else if (mode?.value === "완전랜덤") {
-                            mode.value = "자동";
-                        }
-                        this.properties ??= {};
-                        this.properties.healingCategoryControls = 1;
-                    }
-                    return result;
-                } finally {
-                    if (button) this.widgets.unshift(button);
+        const serialize = nodeType.prototype.serialize;
+        nodeType.prototype.serialize = function (...args) {
+            this.properties ??= {};
+            this.properties.healingCategoryControls = VERSION;
+            const info = serialize.apply(this, args);
+            const widgets = (this.widgets ?? []).filter(w => w.serialize !== false);
+            info.widgets_values = widgets.map(w => w.value);
+            info.widgets_values_named = Object.fromEntries(widgets.map(w => [w.name, w.value]));
+            return info;
+        };
+        const configure = nodeType.prototype.configure;
+        nodeType.prototype.configure = function (info, ...args) {
+            const widgets = (this.widgets ?? []).filter(w => w.serialize !== false);
+            let values = info.widgets_values?.slice();
+            const version = info.properties?.healingCategoryControls;
+            let named = info.widgets_values_named;
+            if (version !== VERSION && values) {
+                // Broken v1 files can contain leading button/seed nulls while
+                // the original seed and mode survive immediately after them.
+                const offset = values.findIndex((v, i) => i <= 2 &&
+                    typeof v === "number" && ["고정", "자동", "순차", "완전랜덤"].includes(values[i + 1]));
+                if (offset > 0 && values.slice(0, offset).every(v => v == null)) values = values.slice(offset);
+                const directionIndex = widgets.findIndex(w => w.name === "이미지방향");
+                const clothingIndex = widgets.findIndex(w => w.name === "의상제거");
+                // Some v1 snapshots lost the direction slot altogether, leaving
+                // the intact clothing toggle and stocking values one slot early.
+                if (version === 1 && values.length === widgets.length - 1 &&
+                    directionIndex >= 0 && clothingIndex === directionIndex + 1 &&
+                    typeof values[directionIndex] === "boolean" &&
+                    typeof values[clothingIndex] === "string") {
+                    values.splice(directionIndex, 0, directionValue(named?.["이미지방향"]));
                 }
-            };
-        }
+                if (!version) {
+                    const countIndex = widgets.findIndex(w => w.name === "촬영_인원");
+                    if (countIndex >= 0) values = values.slice(0, countIndex);
+                }
+                // v1 named values were generated against a reordered array.
+                named = Object.fromEntries(widgets.slice(0, values.length).map((w, i) => [w.name, values[i]]));
+            }
+            if (named) {
+                named = { ...named };
+                if (Object.hasOwn(named, "이미지방향")) named["이미지방향"] = directionValue(named["이미지방향"]);
+                values = widgets.map((w, i) => Object.hasOwn(named, w.name) ? named[w.name] : (values?.[i] ?? w.value));
+            } else if (values) {
+                const i = widgets.findIndex(w => w.name === "이미지방향");
+                if (i >= 0 && i < values.length) values[i] = directionValue(values[i]);
+            }
+            const result = configure.call(this, { ...info, widgets_values: values,
+                widgets_values_named: named }, ...args);
+            const mode = this.widgets?.find(w => w.name === "시드_모드");
+            if (mode?.value === "순차") {
+                for (const w of this.widgets) if (categoryNames.has(w.name) && w.value === "random") w.value = "순차";
+                mode.value = "고정";
+            } else if (mode?.value === "완전랜덤") mode.value = "자동";
+            this.properties ??= {};
+            this.properties.healingCategoryControls = VERSION;
+            return result;
+        };
     },
 });
