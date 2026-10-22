@@ -4,6 +4,10 @@
 
 **프롬프트를 이름별로 보관하고, 헤어·표정·의상·자세를 골라 한 번에 출력합니다.**
 
+![HealingArty Prompt Randomizer Library 레이아웃 시안: 랜덤 설정, 합쳐진 최종 출력, 카테고리별 프롬프트 보관함](docs/prompt-library-layout.webp)
+
+> AI로 제작한 레이아웃 시안입니다. 실제 실행 화면 캡처가 아니며, 구현된 UI의 배치·문구·로고와 일부 차이가 있습니다.
+
 업데이트 후 **ComfyUI 재시작 → Ctrl+F5 → 노드 검색에서 `HealingArty Prompt Randomizer · Library` 추가**.
 기존 **V11 노드는 그대로 유지**합니다. 이전 워크플로를 새 노드로 자동 변환하지 않습니다.
 
