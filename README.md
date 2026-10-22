@@ -1,6 +1,6 @@
 # HealingArty Prompt Randomizer 🎨
 
-## 🎲 새 노드: Prompt Randomizer · Library v1.0.1
+## 🎲 새 노드: Prompt Randomizer · Library v1.0.2
 
 **프롬프트를 이름별로 보관하고, 헤어·표정·의상·자세를 골라 한 번에 출력합니다.**
 
@@ -10,6 +10,10 @@
 
 업데이트 후 **ComfyUI 재시작 → Ctrl+F5 → 노드 검색에서 `HealingArty Prompt Randomizer · Library` 추가**.
 기존 **V11 노드는 그대로 유지**합니다. 이전 워크플로를 새 노드로 자동 변환하지 않습니다.
+
+### v1.0.2 — 노드 배경 통일
+
+노드 바깥 회색 배경을 내부와 같은 짙은 파란색으로 맞추고, 내부 패널의 중복 테두리를 제거했습니다. 저장된 워크플로를 열어도 같은 색상을 적용합니다.
 
 ### 화면 구성
 

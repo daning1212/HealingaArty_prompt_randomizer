@@ -14,7 +14,7 @@ export function readState(raw){const state={...clone(INITIAL),...JSON.parse(raw|
 export class LibraryPanel{
   constructor(node){
     this.node=node;this.state=readState(this.widget()?.value);this.data={revision:0,categories:[],entries:[]};this.schema=null;this.dataReady=false;this.busy=false;this.editing=!this.state.entry_id;
-    this.root=el('div','ha-pl');const title=el('div','ha-pl-title');title.append(el('span','ha-pl-dice','⚄'),el('strong','','HealingArty · Prompt Library'),el('small','','v1.0.1'));this.root.append(title);
+    this.root=el('div','ha-pl');const title=el('div','ha-pl-title');title.append(el('span','ha-pl-dice','⚄'),el('strong','','HealingArty · Prompt Library'),el('small','','v1.0.2'));this.root.append(title);
     const controls=el('section','ha-pl-section');this.grid=el('div','ha-pl-grid');controls.append(this.grid);
     this.selects={};for(const key of ['헤어스타일','의상','표정','신발','가방']){const select=el('select');select.setAttribute('aria-label',LABELS[key]);select.onchange=()=>{this.state.selections[key]=select.value;this.persist();};this.selects[key]=select;this.grid.append(this.field(LABELS[key],select));}
     this.posture=el('select');options(this.posture,['none','서기','앉기','눕기'],this.state.posture);this.posture.onchange=()=>{this.state.posture=this.posture.value;this.state.pose='none';this.renderPoses();this.persist();};this.grid.append(this.field('자세 유형',this.posture));
@@ -137,10 +137,10 @@ export class LibraryPanel{
 }
 
 app.registerExtension({name:'HealingArty.PromptLibrary',async setup(){const link=el('link');link.rel='stylesheet';link.href=new URL('./library.css?v=1.0.1',import.meta.url).href;document.head.append(link);},beforeRegisterNodeDef(Node,data){if(data.name!==TYPE)return;
-  const created=Node.prototype.onNodeCreated;Node.prototype.onNodeCreated=function(){const result=created?.apply(this,arguments);this.resizable=true;const w=this.widgets?.find(w=>w.name==='config');if(w){w.type='hidden';w.computeSize=()=>[0,-4];w.draw=()=>{};}
+  const created=Node.prototype.onNodeCreated;Node.prototype.onNodeCreated=function(){const result=created?.apply(this,arguments);this.resizable=true;this.color='#244866';this.bgcolor='#101b28';const w=this.widgets?.find(w=>w.name==='config');if(w){w.type='hidden';w.computeSize=()=>[0,-4];w.draw=()=>{};}
     this.libraryPanel=new LibraryPanel(this);this.syncLibrarySize=()=>{const style=this.libraryPanel.root.style;style.width=Math.max(420,this.size[0]-20)+'px';style.height=Math.max(480,this.size[1]-65)+'px';};
     this.addDOMWidget('library','healingarty-library',this.libraryPanel.root,{serialize:false,hideOnZoom:false,selectOn:[],getMinHeight:()=>480,getHeight:()=>Math.max(480,this.size[1]-65),onDraw:()=>this.syncLibrarySize(),afterResize:()=>this.syncLibrarySize()});this.setSize([850,920]);this.syncLibrarySize();return result;};
-  const configured=Node.prototype.onConfigure;Node.prototype.onConfigure=function(){const r=configured?.apply(this,arguments);this.libraryPanel?.restore();return r;};
+  const configured=Node.prototype.onConfigure;Node.prototype.onConfigure=function(){const r=configured?.apply(this,arguments);this.color='#244866';this.bgcolor='#101b28';this.libraryPanel?.restore();return r;};
   const executed=Node.prototype.onExecuted;Node.prototype.onExecuted=function(message){const r=executed?.apply(this,arguments);this.libraryPanel?.executed(message);return r;};
   const removed=Node.prototype.onRemoved;Node.prototype.onRemoved=function(){this.libraryPanel?.destroy();return removed?.apply(this,arguments);};
 }});
