@@ -38,8 +38,27 @@ class CompactTests(unittest.TestCase):
             text=Node().generate(self.config(posture=posture,pose='random'))['result'][0]
             self.assertTrue(text)
 
+    def test_restored_garments_and_design_counts(self):
+        from updated_prompt_randomizer import GARMENT_ADDITIONS
+        for category, expected in [('란제리', 229), ('수영복', 200)]:
+            pool = schema()['categories'][category][3:]
+            self.assertEqual(len(pool), expected)
+            self.assertEqual(len(set(pool)), expected)
+            self.assertEqual(len(GARMENT_ADDITIONS[category]), 100)
+            state = copy.deepcopy(DEFAULT)
+            state['seed_mode'] = '고정'
+            state['selections'][category] = GARMENT_ADDITIONS[category][0]
+            self.assertIn(GARMENT_ADDITIONS[category][0], Node().generate(json.dumps(state))['result'][0])
+            state['selections'][category] = 'random'
+            self.assertIn(Node().generate(json.dumps(state))['result'][0], pool)
+            state['selections'][category] = '순차'
+            node = Node()
+            self.assertEqual(node.generate(json.dumps(state))['result'][0], pool[0])
+            self.assertEqual(node.generate(json.dumps(state))['result'][0], pool[1])
+        self.assertTrue(any('sheer camisole' in x for x in GARMENT_ADDITIONS['란제리']))
+
     def test_invalid_config_and_excluded_categories(self):
-        self.assertNotIn('란제리',schema()['categories']);self.assertNotIn('수영복',schema()['categories'])
+        self.assertIn('란제리',schema()['categories']);self.assertIn('수영복',schema()['categories'])
         self.assertNotIn('hair, one side shaved, edgy',schema()['categories']['헤어스타일'])
         for raw in ['null','[]','broken',self.config(seed=1.5),self.config(posture='서기',pose='wrong'),self.config(weights={'표정':float('nan')})]:
             with self.assertRaises(ValueError):parse_config(raw)

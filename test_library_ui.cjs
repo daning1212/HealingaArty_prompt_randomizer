@@ -14,7 +14,7 @@ class Element{
 document={createElement:t=>new Element(t),activeElement:null};document.body=new Element('body');
 let extension,failNext=false,failSchema=false;
 let data={revision:0,categories:[],entries:[]};const clone=x=>JSON.parse(JSON.stringify(x));
-const categoryNames=['헤어스타일','표정','의상','신발','가방','안경','모자','화장','팬티스타킹'];
+const categoryNames=['헤어스타일','표정','의상','란제리','수영복','신발','가방','안경','모자','화장','팬티스타킹'];
 const schema={categories:Object.fromEntries(categoryNames.map(k=>[k,['none','random','순차','example']])),poses:{'서기':['none','random','순차','standing'],'앉기':['none','random','순차','sitting'],'눕기':['none','random','순차','lying']}};
 const ctx={document,window:{confirm(){throw Error('native confirm forbidden');},prompt(){throw Error('native prompt forbidden');}},navigator:{clipboard:{writeText:async()=>{}}},URL,console,app:{registerExtension:e=>extension=e,canvas:{setDirty(){}}},api:{async fetchApi(path,opts){
  if(failNext){failNext=false;return {ok:false,status:500,text:async()=> 'disk write failed'};}

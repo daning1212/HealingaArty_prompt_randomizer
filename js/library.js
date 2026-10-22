@@ -2,7 +2,7 @@ import { app } from '../../scripts/app.js';
 import { api } from '../../scripts/api.js';
 
 const TYPE='HealingArtyPromptLibrary';
-const LABELS={'헤어스타일':'헤어','표정':'표정','의상':'의상','신발':'신발','가방':'가방','안경':'안경','모자':'모자','화장':'화장','팬티스타킹':'팬티스타킹'};
+const LABELS={'헤어스타일':'헤어','표정':'표정','의상':'의상','란제리':'란제리','수영복':'수영복','신발':'신발','가방':'가방','안경':'안경','모자':'모자','화장':'화장','팬티스타킹':'팬티스타킹'};
 const INITIAL={prompt:'',seed:42,seed_mode:'자동',posture:'none',pose:'none',selections:Object.fromEntries(Object.keys(LABELS).map(k=>[k,'none'])),weights:{},category_id:'',entry_id:'',entry_name:''};
 const clone=v=>JSON.parse(JSON.stringify(v));
 function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text)e.textContent=text;return e;}
@@ -14,9 +14,9 @@ export function readState(raw){const state={...clone(INITIAL),...JSON.parse(raw|
 export class LibraryPanel{
   constructor(node){
     this.node=node;this.state=readState(this.widget()?.value);this.data={revision:0,categories:[],entries:[]};this.schema=null;this.dataReady=false;this.busy=false;this.editing=!this.state.entry_id;
-    this.root=el('div','ha-pl');const title=el('div','ha-pl-title');title.append(el('span','ha-pl-dice','⚄'),el('strong','','HealingArty · Prompt Library'),el('small','','v1.0.3'));this.root.append(title);
+    this.root=el('div','ha-pl');const title=el('div','ha-pl-title');title.append(el('span','ha-pl-dice','⚄'),el('strong','','HealingArty · Prompt Library'),el('small','','v1.0.4'));this.root.append(title);
     const controls=el('section','ha-pl-section');this.grid=el('div','ha-pl-grid');controls.append(this.grid);
-    this.selects={};for(const key of ['헤어스타일','의상','표정','신발','가방']){const select=el('select');select.setAttribute('aria-label',LABELS[key]);select.onchange=()=>{this.state.selections[key]=select.value;this.persist();};this.selects[key]=select;this.grid.append(this.field(LABELS[key],select));}
+    this.selects={};for(const key of ['헤어스타일','의상','표정','신발','가방','란제리','수영복']){const select=el('select');select.setAttribute('aria-label',LABELS[key]);select.onchange=()=>{this.state.selections[key]=select.value;this.persist();};this.selects[key]=select;this.grid.append(this.field(LABELS[key],select));}
     this.posture=el('select');options(this.posture,['none','서기','앉기','눕기'],this.state.posture);this.posture.onchange=()=>{this.state.posture=this.posture.value;this.state.pose='none';this.renderPoses();this.persist();};this.grid.append(this.field('자세 유형',this.posture));
     this.pose=el('select');this.pose.onchange=()=>{this.state.pose=this.pose.value;this.persist();};this.grid.append(this.field('포즈',this.pose));
     const extras=el('details');extras.append(el('summary','','액세서리 더 보기'));this.extraGrid=el('div','ha-pl-grid');for(const key of ['안경','모자','화장','팬티스타킹']){const select=el('select');select.onchange=()=>{this.state.selections[key]=select.value;this.persist();};this.selects[key]=select;this.extraGrid.append(this.field(key,select));}extras.append(this.extraGrid);this.grid.append(extras);

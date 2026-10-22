@@ -14,7 +14,7 @@ try:
 except ImportError:
     from updated_prompt_randomizer import HealingArtyPromptRandomizerV11, POSTURE_POSES
 
-CATEGORIES = ('헤어스타일', '표정', '의상', '신발', '가방', '안경', '모자', '화장', '팬티스타킹')
+CATEGORIES = ('헤어스타일', '표정', '의상', '란제리', '수영복', '신발', '가방', '안경', '모자', '화장', '팬티스타킹')
 POSTURES = {'서기': '서서포즈', '앉기': '앉기포즈', '눕기': '누워포즈'}
 DEFAULT = {'prompt': '', 'seed': 42, 'seed_mode': '자동', 'posture': 'none', 'pose': 'none',
            'selections': {k: 'none' for k in CATEGORIES}, 'weights': {}, 'category_id': '', 'entry_id': ''}
