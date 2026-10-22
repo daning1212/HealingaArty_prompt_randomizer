@@ -69,6 +69,21 @@ class StoreTests(unittest.TestCase):
         with self.assertRaises(ConflictError):self.store.change({'revision':0,'action':'delete','id':'x'})
         with self.assertRaises(ValueError):self.change(action='save',id='missing',category_id=c,name='x',prompt='text')
         self.assertEqual(self.path.read_bytes(),before)
+    def test_category_delete_cascades_only_selected_and_keeps_backup(self):
+        data=self.change(action='category_add',name='게임');first=data['categories'][0]['id']
+        data=self.change(action='category_add',name='풍경');second=data['categories'][1]['id']
+        self.change(action='save',category_id=first,name='테리',prompt='red vest')
+        self.change(action='save',category_id=second,name='산',prompt='mountains')
+        self.change(action='save',category_id=first,name='춘리',prompt='blue outfit')
+        data=self.change(action='category_delete',id=first)
+        self.assertEqual([c['id'] for c in data['categories']],[second])
+        self.assertEqual([e['name'] for e in data['entries']],['산'])
+        backup=json.loads(self.path.with_suffix('.json.bak').read_text())
+        self.assertEqual(len(backup['entries']),3)
+        before=self.path.read_bytes()
+        with self.assertRaises(ValueError):self.change(action='category_delete',id='missing')
+        self.assertEqual(self.path.read_bytes(),before)
+
     def test_corruption_never_overwritten(self):
         self.path.parent.mkdir(parents=True);self.path.write_text('{broken')
         with self.assertRaises(ValueError):self.change(action='category_add',name='x')
@@ -95,4 +110,8 @@ class RouteTests(unittest.IsolatedAsyncioTestCase):
                 response=await client.post('/healingarty/prompt-library/data',json={'action':'category_add','name':'게임','revision':0});self.assertEqual(response.status,200)
                 response=await client.post('/healingarty/prompt-library/data',json={'action':'category_add','name':'다른 창','revision':0});self.assertEqual(response.status,409)
                 response=await client.post('/healingarty/prompt-library/data',json={'action':'save','revision':1,'category_id':'missing','name':'x','prompt':'text'});self.assertEqual(response.status,400)
+                response=await client.get('/healingarty/prompt-library/data');data=await response.json()
+                category=data['categories'][0]['id']
+                response=await client.post('/healingarty/prompt-library/data',json={'action':'category_delete','revision':1,'id':category});self.assertEqual(response.status,200)
+                self.assertEqual((await response.json())['categories'],[])
                 self.assertTrue((Path(tmp)/'default'/'healingarty_prompt_library.json').exists())

@@ -138,6 +138,12 @@ class LibraryStore:
                 if any(c['name'].casefold() == name.casefold() for c in data['categories']):
                     raise ValueError('같은 이름의 카테고리가 있습니다.')
                 data['categories'].append({'id': uuid.uuid4().hex, 'name': name})
+            elif action == 'category_delete':
+                category = next((c for c in data['categories'] if c['id'] == body.get('id')), None)
+                if category is None:
+                    raise ValueError('삭제할 카테고리를 선택하세요.')
+                data['categories'].remove(category)
+                data['entries'] = [e for e in data['entries'] if e['category_id'] != category['id']]
             elif action == 'save':
                 category = body.get('category_id')
                 if not any(c['id'] == category for c in data['categories']):
