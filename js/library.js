@@ -1,5 +1,6 @@
 import { app } from '../../scripts/app.js';
 import { api } from '../../scripts/api.js';
+import { installCanvasNavigation } from './navigation.js';
 
 const TYPE='HealingArtyPromptLibrary';
 const LABELS={'헤어스타일':'헤어','표정':'표정','의상':'의상','란제리':'란제리','수영복':'수영복','신발':'신발','가방':'가방','안경':'안경','모자':'모자','화장':'화장','팬티스타킹':'팬티스타킹'};
@@ -14,7 +15,7 @@ export function readState(raw){const state={...clone(INITIAL),...JSON.parse(raw|
 export class LibraryPanel{
   constructor(node){
     this.node=node;this.state=readState(this.widget()?.value);this.data={revision:0,categories:[],entries:[]};this.schema=null;this.dataReady=false;this.busy=false;this.editing=!this.state.entry_id;
-    this.root=el('div','ha-pl');const title=el('div','ha-pl-title');title.append(el('span','ha-pl-dice','⚄'),el('strong','','HealingArty · Prompt Library'),el('small','','v1.0.4'));this.root.append(title);
+    this.root=el('div','ha-pl');const title=el('div','ha-pl-title');title.append(el('span','ha-pl-dice','⚄'),el('strong','','HealingArty · Prompt Library'),el('small','','v1.0.5'));this.root.append(title);
     const controls=el('section','ha-pl-section');this.grid=el('div','ha-pl-grid');controls.append(this.grid);
     this.selects={};for(const key of ['헤어스타일','의상','표정','신발','가방','란제리','수영복']){const select=el('select');select.setAttribute('aria-label',LABELS[key]);select.onchange=()=>{this.state.selections[key]=select.value;this.persist();};this.selects[key]=select;this.grid.append(this.field(LABELS[key],select));}
     this.posture=el('select');options(this.posture,['none','서기','앉기','눕기'],this.state.posture);this.posture.onchange=()=>{this.state.posture=this.posture.value;this.state.pose='none';this.renderPoses();this.persist();};this.grid.append(this.field('자세 유형',this.posture));
@@ -33,6 +34,7 @@ export class LibraryPanel{
     this.editor=el('textarea','ha-pl-editor');this.editor.maxLength=200000;this.editor.placeholder='프롬프트를 입력하거나 저장 목록에서 선택하세요.';this.editor.setAttribute('aria-label','저장 프롬프트');this.editor.oninput=()=>{this.state.prompt=this.editor.value;this.persist();};library.append(this.field('저장 프롬프트',this.editor));
     this.buttons=el('div','ha-pl-row');this.buttons.append(button('+ 새 프롬프트',()=>this.newEntry()),button('수정',()=>{this.editing=true;this.syncEditor();this.editor.focus();}),button('프롬프트 저장',()=>this.saveEntry(),'ha-pl-primary'),button('이름 변경',()=>this.rename()),button('프롬프트 삭제',()=>this.remove(),'ha-pl-delete'));library.append(this.buttons);
     this.status=el('div','ha-pl-status','보관함 불러오는 중…');this.status.setAttribute('role','status');this.error=el('div','ha-pl-error');this.error.setAttribute('role','alert');this.error.hidden=true;library.append(this.status,this.error);this.root.append(library);
+    this.removeCanvasNavigation=installCanvasNavigation(this.root,()=>app.canvas?.canvas);
     for(const event of ['pointerdown','mousedown','pointerup','mouseup','click','dblclick','wheel','keydown'])this.root.addEventListener(event,e=>e.stopPropagation());
     this.restore();this.ready=this.initialize();
   }
@@ -133,10 +135,10 @@ export class LibraryPanel{
   }
   executed(message){const prompt=message?.prompt?.[0];if(typeof prompt!=='string')return;this.output.value=prompt;const seed=message.used_seed?.[0]??'';this.node.properties??={};this.node.properties.haLibraryResult={prompt,seed};const changed=message.config_used?.[0]!==this.widget()?.value;this.resultStatus.textContent=(changed?'이전 설정의 실행 결과':'마지막 실행 결과')+' · 사용 시드 '+seed+(message.text_in_connected?.[0]?' · text_in 포함':'');}
   async copy(){try{await navigator.clipboard.writeText(this.output.value);this.status.textContent='최종 출력을 복사했습니다.';}catch{this.output.focus();this.output.select();this.status.textContent='자동 복사가 제한되었습니다. Ctrl+C로 복사하세요.';}}
-  destroy(){this.destroyed=true;this.dialogClose?.();}
+  destroy(){this.removeCanvasNavigation?.();this.destroyed=true;this.dialogClose?.();}
 }
 
-app.registerExtension({name:'HealingArty.PromptLibrary',async setup(){const link=el('link');link.rel='stylesheet';link.href=new URL('./library.css?v=1.0.3',import.meta.url).href;document.head.append(link);},beforeRegisterNodeDef(Node,data){if(data.name!==TYPE)return;
+app.registerExtension({name:'HealingArty.PromptLibrary',async setup(){const link=el('link');link.rel='stylesheet';link.href=new URL('./library.css?v=1.0.5',import.meta.url).href;document.head.append(link);},beforeRegisterNodeDef(Node,data){if(data.name!==TYPE)return;
   const created=Node.prototype.onNodeCreated;Node.prototype.onNodeCreated=function(){const result=created?.apply(this,arguments);this.resizable=true;this.color='#244866';this.bgcolor='#101b28';const w=this.widgets?.find(w=>w.name==='config');if(w){w.type='hidden';w.computeSize=()=>[0,-4];w.draw=()=>{};}
     this.libraryPanel=new LibraryPanel(this);this.syncLibrarySize=()=>{const style=this.libraryPanel.root.style;style.width='100%';style.height='100%';};
     this.addDOMWidget('library','healingarty-library',this.libraryPanel.root,{serialize:false,hideOnZoom:false,selectOn:[],getMinHeight:()=>480,onDraw:()=>this.syncLibrarySize(),afterResize:()=>this.syncLibrarySize()});this.setSize([850,920]);this.syncLibrarySize();return result;};

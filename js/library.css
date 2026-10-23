@@ -13,3 +13,5 @@
 .ha-pl-modal input,.ha-pl-modal select,.ha-pl-modal button{box-sizing:border-box;font:inherit;color:inherit;background:#0f1926;border:1px solid #536d88;border-radius:5px;padding:10px;min-width:0}
 .ha-pl-modal input,.ha-pl-modal select{width:100%}.ha-pl-modal input:focus,.ha-pl-modal select:focus{outline:2px solid #66b7ff}
 .ha-pl-modal-actions{display:flex;justify-content:flex-end;gap:10px}.ha-pl-modal button{cursor:pointer;min-width:80px}.ha-pl-modal .ha-pl-primary{background:#126cdf}.ha-pl-modal .ha-pl-delete{background:#5c2131;color:#ffb5b5;border-color:#e1737c}
+
+.ha-pl.ha-pl-panning,.ha-pl.ha-pl-panning *{cursor:grabbing!important}

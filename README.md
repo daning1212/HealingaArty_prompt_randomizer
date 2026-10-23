@@ -2,11 +2,24 @@
 
 프롬프트를 카테고리별로 보관하고, 선택한 헤어·표정·의상·포즈를 합쳐 출력하는 ComfyUI 노드입니다.
 
-이 안내는 현재 **Library v1.0.4** 기준입니다. 노드 검색에서 **🎲 HealingArty Prompt Randomizer · Library**를 선택하세요.
+이 안내는 현재 **Library v1.0.5** 기준입니다. 노드 검색에서 **🎲 HealingArty Prompt Randomizer · Library**를 선택하세요.
 
 ![HealingArty Prompt Library 레이아웃 시안](docs/prompt-library-layout.webp)
 
 > AI로 제작한 레이아웃 시안입니다. 실제 실행 화면 캡처가 아니며, 현재 UI의 메뉴·배치·문구와 차이가 있습니다.
+
+## v1.0.5 — 노드 안에서 확대·축소와 화면 이동
+
+| 조작 위치 / 방법 | 동작 |
+| --- | --- |
+| 노드 내부의 버튼·선택 메뉴·여백 위에서 휠 | ComfyUI 캔버스 확대·축소 |
+| 내용이 길어 스크롤이 생긴 프롬프트·최종 출력창 위에서 휠 | 해당 글상자 내용 스크롤 |
+| 글상자 위에서 Ctrl+휠 | ComfyUI 캔버스 확대·축소 |
+| 노드 내부 어디서든 가운데 휠 버튼을 누르고 드래그 | ComfyUI 캔버스 이동 |
+
+캔버스 휠 동작은 ComfyUI 탐색 설정을 따릅니다. 글상자 스크롤은 맨 위나 아래에서도 캔버스 줌으로 바뀌지 않습니다. 노드 전체 내용이 높이를 넘으면 오른쪽 스크롤바를 끌어 이동할 수 있습니다. 저장·삭제 확인창에서는 기존 입력 동작을 유지합니다.
+
+기존 노드와 설정을 그대로 사용할 수 있습니다. 설치 폴더에서 `git pull` 후 브라우저 **Ctrl+F5**로 갱신하세요.
 
 ## 설치 및 업데이트
 
@@ -153,9 +166,10 @@ ComfyUI 사용자 폴더를 따로 지정했다면 그 폴더 아래의 `default
 python -m unittest discover -v
 node test_controls.cjs
 node test_library_ui.cjs
+node test_navigation.mjs
 node --input-type=module --check < js/library.js
 ```
 
-생성 로직, 고정 시드·순차, 프롬프트 합치기, 보관함 저장·수정·삭제·백업·동시 수정 충돌과 모의 UI 조작을 검사합니다. 자동 검사는 실제 ComfyUI 화면 렌더링이나 이미지 생성 결과를 보장하지 않습니다.
+생성 로직, 고정 시드·순차, 프롬프트 합치기, 보관함 저장·수정·삭제·백업·동시 수정 충돌과 모의 UI 조작을 검사합니다. 화면 이동·휠 좌표 전달·긴 글상자 스크롤·Ctrl 확대·축소 분기와 취소·노드 삭제 시 정리도 모의 이벤트로 검사합니다. 자동 검사는 실제 ComfyUI 화면 렌더링이나 이미지 생성 결과를 보장하지 않습니다.
 
 Made by @daning1212.
